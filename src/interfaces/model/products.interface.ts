@@ -3,11 +3,8 @@ import { IDateStamps } from "..";
 
 export interface IProducts {
   name: string;
-  lastName: string;
-  password: string;
-  phoneNumber: string;
-  gender: string;
-  birthDate: string;
+  price: number;
+  variation: "S" | "M" | "X";
   deleted: boolean;
 }
 
