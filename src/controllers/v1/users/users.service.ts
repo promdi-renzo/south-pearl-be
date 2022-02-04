@@ -93,6 +93,16 @@ export class UsersServices {
     return result;
   }
 
+  async changePass(id: string, password: string): ASYNC_RESPONSE {
+    const result = await this.model.findOne({ _id: id }, "-password");
+    if (!result) return { status: "success", error: false, message: "User not found!" };
+
+    result?.setPassword(password);
+    result?.save();
+
+    return { status: "success", error: false, message: "Successfully updated user's password." };
+  }
+
   async delete(id: string): ASYNC_RESPONSE {
     const result = await this.model.findOneAndUpdate({ _id: id }, { deleted: true }, { new: true });
     if (!result) return { status: "success", error: false, message: "User not found!" };

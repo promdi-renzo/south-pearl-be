@@ -1,11 +1,11 @@
-import { Get, Patch, Post, Delete, Put } from "@mayajs/common";
-import { MayaJsContext } from "@mayajs/router";
+import { Get, Patch, Post, Delete } from "@mayajs/common";
 import { Controller } from "@mayajs/core";
 import { UsersServices } from "./users.service";
 import { ASYNC_RESPONSE, IContext } from "../../../interfaces";
 import { createToken, verifyToken } from "../../../middlewares";
 import env from "../../../environments";
 import { UtilsServices } from "../../../services/utils.service";
+import validator from "../../../validators/users.validator";
 
 @Controller()
 export class UsersController {
@@ -32,6 +32,12 @@ export class UsersController {
   @Post({ path: "/", middlewares: [] })
   async create({ body, req }: IContext): ASYNC_RESPONSE {
     const result = await this.services.create(body);
+    return { ...result, meta: { ...result.meta, token: createToken(req.user) } };
+  }
+
+  @Patch({ path: "/:id/password", middlewares: [...validator.updatePass] })
+  async changePass({ params, req, body }: IContext): ASYNC_RESPONSE {
+    const result = await this.services.changePass(params.id, body.password);
     return { ...result, meta: { ...result.meta, token: createToken(req.user) } };
   }
 
