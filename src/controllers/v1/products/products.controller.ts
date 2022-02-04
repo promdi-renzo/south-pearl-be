@@ -1,45 +1,42 @@
-import { Get, Patch, Post, Delete, Put } from "@mayajs/common";
-import { MayaJsContext } from "@mayajs/router";
+import { Get, Patch, Post, Delete } from "@mayajs/common";
 import { Controller } from "@mayajs/core";
-import { ProductsServices } from "./products.service"
+import { IContext, ASYNC_RESPONSE } from "../../../interfaces";
+import { createToken } from "../../../middlewares";
+import { ProductsServices } from "./products.service";
+
 
 @Controller()
 export class ProductsController {
   constructor(private services: ProductsServices) {}
 
-  @Post()
-  async createProducts({ body }: MayaJsContext): Promise<any> {
-    // Create a Products
-    return { message: "From ProductsController POST route", body };
-  }
-
   @Get()
-  async readProducts(): Promise<any> {
-    // Read all Products list
-    return { message: "From ProductsController GET route" };
+  async getAll({ query, req }: IContext): ASYNC_RESPONSE {
+    const result = await this.services.getAll(query);
+    return { ...result, meta: { ...result.meta, token: createToken(req.user) } };
   }
 
   @Get("/:id")
-  async readProductsByID({ params }: MayaJsContext): Promise<any> {
-    // Read Products by ID from list
-    return { message: "From ProductsController GET route with params ID", params };
+  async getById({ params, req }: IContext): ASYNC_RESPONSE {
+    const result = await this.services.getById(params.id);
+    return { ...result, meta: { ...result.meta, token: createToken(req.user) } };
   }
 
-  @Put("/:id")
-  async replaceProducts({ body, params }: MayaJsContext): Promise<any> {
-    // Replace Products from list
-    return { message: "From ProductsController PUT route", body, params };
+  @Post()
+  async create({ body, req }: IContext): ASYNC_RESPONSE {
+    const result = await this.services.create(body);
+    return { ...result, meta: { ...result.meta, token: createToken(req.user) } };
   }
 
-  @Patch("/:id")
-  async updateProducts({ body, params }: MayaJsContext): Promise<any> {
-    // Update Products from list
-    return { message: "From ProductsController PATCH route", body, params };
+  @Patch({ path: "/:id", })
+  async update({ params, body, req }: IContext): ASYNC_RESPONSE {
+    const result = await this.services.update(params.id, body);
+    return { ...result, meta: { ...result.meta, token: createToken(req.user) } };
   }
 
   @Delete("/:id")
-  async deleteProducts({ params }: MayaJsContext): Promise<any> {
-    // Delete Products from list
-    return { message: "From ProductsController DELETE route", params };
+  async delete({ params, req }: IContext): ASYNC_RESPONSE {
+    const result = await this.services.delete(params.id);
+    return { ...result, meta: { ...result.meta, token: createToken(req.user) } };
   }
+  
 }
